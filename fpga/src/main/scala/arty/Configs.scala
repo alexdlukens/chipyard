@@ -21,7 +21,8 @@ import chipyard.{BuildSystem}
 
 class WithDefaultPeripherals extends Config((site, here, up) => {
   case PeripheryUARTKey => List(
-    UARTParams(address = 0x10013000))
+    UARTParams(address = 0x10013000),
+    UARTParams(address = 0x10200000))
   case DTSTimebase => BigInt(32768)
   case JtagDTMKey => new JtagDTMConfig (
     idcodeVersion = 2,
@@ -45,7 +46,7 @@ class WithDefaultPeripherals extends Config((site, here, up) => {
 // DOC include start: AbstractArty and Rocket
 class WithArtyTweaks extends Config(
   new WithArtyGPIOHarnessBinder ++
-  new WithGPIOPassthrough ++
+  new chipyard.iobinders.WithGPIOIOCells ++
   new WithArtyJTAGHarnessBinder ++
   new WithArtyUARTHarnessBinder ++
   new WithArtyResetHarnessBinder ++
@@ -60,9 +61,11 @@ class TinyRocketArtyConfig extends Config(
   new chipyard.TinyRocketConfig)
 
 class ArtyWithGPIOConfig extends Config(
+  new chipyard.config.WithRV64 ++
   new chipyard.config.WithGPIOIncludeIOF(true) ++
   new chipyard.config.WithGPIOWidth(32) ++
   new chipyard.config.WithGPIO ++
+  new chipyard.config.WithPeripheryBusFrequency(65.0) ++
   new TinyRocketArtyConfig
 )
 // DOC include end: AbstractArty and Rocket
