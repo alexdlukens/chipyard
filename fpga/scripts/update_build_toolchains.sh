@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #Script to enable multilib support in RISCV-GNU-Toolchain in Chipyard. Useful for using Freedom-E-SDK to compile programs for Arty FPGA boards
-#Alexander Lukens 06/21/2021
+
 
 #Move to script directory
 starting_dir=$(pwd)
