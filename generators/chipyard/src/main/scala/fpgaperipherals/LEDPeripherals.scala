@@ -10,9 +10,10 @@ import freechips.rocketchip.diplomacy._
 import freechips.rocketchip.regmapper.{HasRegMap, RegField}
 import freechips.rocketchip.tilelink._
 import sifive.blocks.devices.gpio._
+import testchipip._
 
 case class LEDParams(
-  address: BigInt = 0x50000000,
+  address: BigInt = 0x0,
   color: String = "red",
   width: Int = 1,
   header: String = "&gpio0 0",
@@ -21,48 +22,35 @@ case class LEDParams(
 
 case object LEDKey extends Field[Option[LEDParams]](None)
 
-trait LEDTopIO extends Bundle {
-    val led_input = Input(Bool())
-}
-
-class LEDIO(val w: Int) extends Bundle {
-    val clock = Input(Clock())
-    val reset = Input(Bool())
-}
 
 
-trait HasLEDIO extends BaseModule {
-    val w: Int
-    val io = IO(new LEDIO(w))
-}
 
-class LEDChiselModule(val w: Int) extends Module with HasLEDIO {
-    
-}
-
-trait LEDModule extends HasRegMap{
-    val io: LEDTopIO
-
-    implicit val p: Parameters
-    def params: LEDParams
-    val clock: Clock
-    val reset: Reset
-    val impl = Module(new LEDChiselModule(params.width))
-
-}
-
-
-class LEDTL(params: LEDParams, beatBytes: Int)(implicit p: Parameters)
-  extends TLRegisterRouter(
-    params.address, "led0", Seq("sifive,gpio-leds"),
-    beatBytes = beatBytes)(
-      new TLRegBundle(params, _) with LEDTopIO)(
-      new TLRegModule(params, _, _) with LEDModule){
-        override def extraResources(resources: ResourceBindings) = Map(
+class LEDTL(params: LEDParams)(implicit p: Parameters) extends LazyModule
+{
+    val beatBytes = 8 
+    val device = new SimpleDevice("led0", Seq("sifive,gpio-leds")){
+        def extraResources(resources: ResourceBindings) = Map(
             "label"      -> Seq(ResourceString("LD0red")),
             "gpios"          -> Seq(ResourceString("<&gpio0 0>")),
             "linux,default-trigger" -> Seq(ResourceString("none")))
-      }
+        override def describe(resources: ResourceBindings): Description = {
+        val Description(name, mapping) = super.describe(resources)
+        Description(name, mapping ++ extraResources(resources))
+        }
+    }
+    
+    val node = TLRegisterNode(
+        address = Seq(AddressSet(0x1000, 0xff)),
+        device = device,
+        beatBytes = 8)
+
+    lazy val module = new LazyModuleImp(this){
+    }
+
+    
+}
+    
+    
       
 
 
@@ -72,7 +60,7 @@ trait CanHavePeripheryGPIOLED {
 
     val led = p(LEDKey) match {
         case Some(params) => {
-            val led = LazyModule(new LEDTL(params, pbus.beatBytes)(p))
+            val led = LazyModule(new LEDTL(params)(p))
             pbus.toVariableWidthSlave(Some(portName)) { led.node }
             Some(led)
         }

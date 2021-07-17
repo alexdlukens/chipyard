@@ -18,10 +18,12 @@ import sifive.blocks.devices.spi._
 import testchipip.{SerialTLKey}
 
 import chipyard.{BuildSystem}
+import chipyard.fpgaperipherals._
 
 class WithDefaultPeripherals extends Config((site, here, up) => {
   case PeripheryUARTKey => List(
-    UARTParams(address = 0x10013000))
+    UARTParams(address = 0x10013000),
+    UARTParams(address = 0x10200000))
   case DTSTimebase => BigInt(32768)
   case JtagDTMKey => new JtagDTMConfig (
     idcodeVersion = 2,
@@ -60,6 +62,7 @@ class TinyRocketArtyConfig extends Config(
   new chipyard.TinyRocketConfig)
 
 class ArtyWithGPIOConfig extends Config(
+  new chipyard.fpgaperipherals.WithGPIOLEDs ++
   new chipyard.config.WithRV64 ++
   new chipyard.config.WithGPIOIncludeIOF(true) ++
   new chipyard.config.WithGPIOWidth(32) ++
