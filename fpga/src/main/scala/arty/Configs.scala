@@ -21,8 +21,7 @@ import chipyard.{BuildSystem}
 
 class WithDefaultPeripherals extends Config((site, here, up) => {
   case PeripheryUARTKey => List(
-    UARTParams(address = 0x10013000),
-    UARTParams(address = 0x10200000))
+    UARTParams(address = 0x10013000))
   case DTSTimebase => BigInt(32768)
   case JtagDTMKey => new JtagDTMConfig (
     idcodeVersion = 2,
