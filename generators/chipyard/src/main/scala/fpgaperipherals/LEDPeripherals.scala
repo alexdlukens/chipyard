@@ -23,12 +23,14 @@ case class LEDParams(
 case object LEDKey extends Field[Option[LEDParams]](None)
 
 
+object GPIOLEDs {
+    private var index: Int = 0
+}
 
-
-class LEDTL(params: LEDParams)(implicit p: Parameters) extends LazyModule
+class GPIOLEDs(params: LEDParams)(implicit p: Parameters) extends LazyModule with BindingScope
 {
     val beatBytes = 8 
-    val device = new SimpleDevice("led0", Seq("sifive,gpio-leds")){
+    val device = new SimpleDevice({"led" + GPIOLEDs.index.toString}, Seq("sifive,gpio-leds")){
         def extraResources(resources: ResourceBindings) = Map(
             "label"      -> Seq(ResourceString("LD0red")),
             "gpios"          -> Seq(ResourceString("<&gpio0 0>")),
@@ -37,19 +39,44 @@ class LEDTL(params: LEDParams)(implicit p: Parameters) extends LazyModule
         val Description(name, mapping) = super.describe(resources)
         Description(name, mapping ++ extraResources(resources))
         }
-    }
-    
-    val node = TLRegisterNode(
-        address = Seq(AddressSet(0x1000, 0xff)),
-        device = device,
-        beatBytes = 8)
+        ResourceBinding {
+            Resource(this, "").bind(ResourceInt(0x5000))
+        }
 
+        
+    }
     lazy val module = new LazyModuleImp(this){
+
     }
 
     
 }
+class LEDTL2(params: LEDParams)(implicit p: Parameters) extends LazyModule with BindingScope
+{
+    val beatBytes = 8 
+    val device = new SimpleDevice("led", Seq("sifive,gpio-leds")){
+        def extraResources(resources: ResourceBindings) = Map(
+            "label"      -> Seq(ResourceString("LD0red")),
+            "gpios"          -> Seq(ResourceString("<&gpio0 0>")),
+            "linux,default-trigger" -> Seq(ResourceString("none")))
+        override def describe(resources: ResourceBindings): Description = {
+        val Description(name, mapping) = super.describe(resources)
+        Description(name, mapping ++ extraResources(resources))
+        }
+        ResourceBinding {
+            Resource(this, "").bind(ResourceInt(0x5000))
+        }
+
+        
+    }
     
+    
+    lazy val module = new LazyModuleImp(this){
+
+    }
+
+    
+}   
     
       
 
@@ -60,8 +87,7 @@ trait CanHavePeripheryGPIOLED {
 
     val led = p(LEDKey) match {
         case Some(params) => {
-            val led = LazyModule(new LEDTL(params)(p))
-            pbus.toVariableWidthSlave(Some(portName)) { led.node }
+            val led = LazyModule(new GPIOLEDs(params)(p))
             Some(led)
         }
         case None => None
