@@ -28,8 +28,8 @@ fi
 
 LINE_NUM=$(awk '/@10014000/ {print FNR}' ${MODIFIED_DTS})
 [ -z "$LINE_NUM" ] && echo "SPI Flash@10014000 device not found, exiting" && exit 1
-if grep -qF "flash@0" ${MODIFIED_DTS};then
-	echo "DTS File already has device flash@0"
+if grep -qF "flash" ${MODIFIED_DTS};then
+	echo "DTS File already has device flash"
 else
 	echo "Editing DTS File"
 	
