@@ -35,6 +35,7 @@ class WithDefaultPeripherals extends Config((site, here, up) => {
     SPIFlashParams(
       fAddress = 0x20000000,
       rAddress = 0x10014000,
+      fSize = 0x7a12000,
       defaultSampleDel = 3))
   case BootROMLocated(x) => up(BootROMLocated(x), site).map { p =>
     // invoke makefile for xip
@@ -61,6 +62,9 @@ class TinyRocketArtyConfig extends Config(
   new WithArtyTweaks ++
   new chipyard.TinyRocketConfig)
 
+//WithPeripheryBusFrequency tells Chipyard to use a specific PBUS clock,
+//without this config fragment, the Freedom-E-SDK does not know what frequency
+//the fpga is running at, and it is harder to get correct serial output
 class ArtyWithGPIOConfig extends Config(
   new chipyard.fpgaperipherals.WithGPIOLEDs ++
   new chipyard.config.WithRV64 ++
