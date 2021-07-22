@@ -14,15 +14,15 @@ import testchipip._
 
 //Instantiate RGB LEDs as sub-devices under GPIO_0
 class WithGPIOLEDs extends Config((site,here,up) => {
-    case LEDKey => (Seq(LEDParams(color="red", pinNumber = 1), 
-                        LEDParams(color="green", pinNumber = 2), 
-                        LEDParams(color="blue", pinNumber = 3),
-                        LEDParams(color="red", pinNumber = 19),
-                        LEDParams(color="green", pinNumber = 21),
-                        LEDParams(color="blue", pinNumber = 22),
-                        LEDParams(color="red", pinNumber = 11),
-                        LEDParams(color="green", pinNumber = 12),
-                        LEDParams(color="blue", pinNumber = 13)))
+    case LEDKey => (Seq(LEDParams(color="red", label="LD0", pinNumber = 1), 
+                        LEDParams(color="green", label="LD0", pinNumber = 2), 
+                        LEDParams(color="blue", label="LD0", pinNumber = 3),
+                        LEDParams(color="red", label="LD1", pinNumber = 19),
+                        LEDParams(color="green", label="LD1", pinNumber = 21),
+                        LEDParams(color="blue", label="LD1", pinNumber = 22),
+                        LEDParams(color="red", label="LD2", pinNumber = 11),
+                        LEDParams(color="green", label="LD2", pinNumber = 12),
+                        LEDParams(color="blue", label="LD2", pinNumber = 13)))
 })
 
 // class WithGPIOButtons extends Config((site,here,up) => {
