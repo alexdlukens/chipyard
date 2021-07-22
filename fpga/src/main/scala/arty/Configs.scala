@@ -35,7 +35,7 @@ class WithDefaultPeripherals extends Config((site, here, up) => {
     SPIFlashParams(
       fAddress = 0x20000000,
       rAddress = 0x10014000,
-      fSize = 0x7a12000,
+      fSize = 0x1000000,
       defaultSampleDel = 3))
   case BootROMLocated(x) => up(BootROMLocated(x), site).map { p =>
     // invoke makefile for xip
