@@ -6,6 +6,7 @@ import freechips.rocketchip.config.{Parameters}
 import freechips.rocketchip.devices.debug._
 import freechips.rocketchip.jtag.{JTAGIO}
 import freechips.rocketchip.subsystem._
+import freechips.rocketchip.diplomaticobjectmodel.logicaltree._
 
 import chipyard.iobinders.GetSystemParameters
 
@@ -71,6 +72,13 @@ class WithArtyUARTHarnessBinder extends OverrideHarnessBinder({
     withClockAndReset(th.harnessClock, th.harnessReset) {
       IOBUF(th.uart_rxd_out,  ports.head.txd)
       ports.head.rxd := IOBUF(th.uart_txd_in)
+
+      val io_uart2 = Wire(new UARTPins(() => new BasePin())).suggestName("ck_uart")
+      UARTPinsFromPort(io_uart2, ports(1), clock = th.harnessClock, reset = th.harnessReset.asBool)
+      IOBUF(th.ck_io(0), io_uart2.txd)
+      IOBUF(th.ck_io(1), io_uart2.rxd)
+      io_uart2.rxd.i.po.map(_ := DontCare)
+      io_uart2.txd.i.po.map(_ := DontCare)
     }
   }
 })
