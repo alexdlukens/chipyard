@@ -6,7 +6,6 @@ import freechips.rocketchip.diplomacy.{LazyModule}
 import freechips.rocketchip.config.{Parameters}
 
 import sifive.fpgashells.shell.xilinx.artyshell.{ArtyShell}
-import sifive.fpgashells.shell.xilinx.{Arty100TShell}
 
 import chipyard.{BuildTop, HasHarnessSignalReferences, HasTestHarnessFunctions}
 import chipyard.harness.{ApplyHarnessBinders}
@@ -23,7 +22,7 @@ class ArtyFPGATestHarness(override implicit val p: Parameters) extends ArtyShell
   val dReset = Wire(AsyncReset())
   dReset := reset_core.asAsyncReset
 
-  // default to 32MHz clock
+  // default to 65MHz clock
   withClockAndReset(clock_65MHz, hReset) {
     val dut = Module(lazyDut.module)
   }
