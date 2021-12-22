@@ -66,6 +66,7 @@ class TinyRocketArtyConfig extends Config(
 //without this config fragment, the Freedom-E-SDK does not know what frequency
 //the fpga is running at, and it is harder to get correct serial output
 class ArtyWithGPIOConfig extends Config(
+  new chipyard.fpgaperipherals.WithGPIOButtons ++
   new chipyard.fpgaperipherals.WithGPIOLEDs ++
   new chipyard.config.WithRV64 ++
   new chipyard.config.WithGPIOIncludeIOF(true) ++
