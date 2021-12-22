@@ -5,6 +5,7 @@ import chisel3._
 import freechips.rocketchip.diplomacy.{LazyModule}
 import freechips.rocketchip.config.{Parameters}
 
+import sifive.blocks.devices.mockaon._
 import sifive.fpgashells.shell.xilinx.artyshell.{ArtyShell}
 
 import chipyard.{BuildTop, HasHarnessSignalReferences, HasTestHarnessFunctions}
@@ -21,13 +22,13 @@ class ArtyFPGATestHarness(override implicit val p: Parameters) extends ArtyShell
 
   val dReset = Wire(AsyncReset())
   dReset := reset_core.asAsyncReset
-
+  val aon = new MockAONWrapperPins()
   // default to 65MHz clock
-  withClockAndReset(clock_65MHz, hReset) {
+  withClockAndReset(clock_32MHz, hReset) {
     val dut = Module(lazyDut.module)
   }
 
-  val harnessClock = clock_65MHz
+  val harnessClock = clock_32MHz
   val harnessReset = hReset
   val success = false.B
 

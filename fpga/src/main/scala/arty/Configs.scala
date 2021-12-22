@@ -14,6 +14,7 @@ import freechips.rocketchip.tile._
 import sifive.blocks.devices.gpio._
 import sifive.blocks.devices.uart._
 import sifive.blocks.devices.spi._
+import sifive.blocks.devices.mockaon._
 
 import testchipip.{SerialTLKey}
 
@@ -37,6 +38,8 @@ class WithDefaultPeripherals extends Config((site, here, up) => {
       rAddress = 0x10014000,
       fSize = 0x1000000,
       defaultSampleDel = 3))
+  case PeripheryMockAONKey =>
+    MockAONParams(address = 0x10000000)
   case BootROMLocated(x) => up(BootROMLocated(x), site).map { p =>
     // invoke makefile for xip
     val make = s"make -C fpga/src/main/resources/arty/xip bin"
@@ -72,7 +75,7 @@ class ArtyWithGPIOConfig extends Config(
   new chipyard.config.WithGPIOIncludeIOF(true) ++
   new chipyard.config.WithGPIOWidth(32) ++
   new chipyard.config.WithGPIO ++
-  new chipyard.config.WithPeripheryBusFrequency(65.0) ++
+  new chipyard.config.WithPeripheryBusFrequency(32.0) ++
   new TinyRocketArtyConfig
 )
 // DOC include end: AbstractArty and Rocket

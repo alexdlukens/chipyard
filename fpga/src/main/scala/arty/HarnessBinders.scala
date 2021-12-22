@@ -1,6 +1,7 @@
 package chipyard.fpga.arty
 
 import chisel3._
+import chisel3.util._
 
 import freechips.rocketchip.config.{Parameters}
 import freechips.rocketchip.devices.debug._
@@ -190,6 +191,20 @@ class WithArtyGPIOHarnessBinder extends OverrideHarnessBinder({
       io_gpio.pins(25).i.ival := 0.U
 
       io_gpio.pins.foreach {x => x.i.po.map(_ := DontCare)}
+
+      //connect pins for AON block (sifive/freedom project)
+      val slow_clock = Wire(Bool())
+
+      // Divide clock by 256, used to generate 32.768 kHz clock for AON block
+      withClockAndReset(th.clock_8MHz, ~th.mmcm_locked) {
+        val clockToggleReg = RegInit(false.B)
+        val (_, slowTick) = Counter(true.B, 256)
+        when (slowTick) {clockToggleReg := ~clockToggleReg}
+        slow_clock := clockToggleReg
+      }
+      Wire(th.aon.erst_n.i.ival)       := (~th.reset_periph)
+      Wire(th.aon.lfextclk.i.ival)     := slow_clock
+      Wire(th.aon.pmu.vddpaden.i.ival) := 1.U
     }
     
 
