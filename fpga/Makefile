@@ -147,7 +147,7 @@ mcs: $(mcs)
 
 .PHONY: bsp
 bsp: $(build_dir)/$(long_name).dts $(mcs)
-	cd $(base_dir)/fpga/scripts; ./generate_bsp.sh $(long_name)
+	cd $(base_dir)/fpga/scripts; ./generate_bsp.sh $(long_name) $(BOARD) $(CONFIG)
 
 #########################################################################################
 # general cleanup rules

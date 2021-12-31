@@ -10,7 +10,8 @@
 #Name of the directory where generated board files are placed
 #in the default project, this is the following:
 LONG_NAME=${1}
-
+BOARD=${2}
+CONFIG=${3}
 #Generated DTS Path
 GENERATED_DTS=${FPGA_PATH}/generated-src/${LONG_NAME}/${LONG_NAME}.dts
 MODIFIED_DTS=${FPGA_PATH}/generated-src/${LONG_NAME}/${LONG_NAME}_modified.dts
@@ -35,19 +36,19 @@ else
 	
 	#edit dts file to include 'flash' device under spi@10014000 node	
 	sed -i "${LINE_NUM},/\};/{s/\};/\tflash@0 \{\n\t\t\t\tcompatible = \"jedec,spi-nor\"; \n\t\t\t\treg = <0x20000000 0x7a12000>; \n\t\t\t\}; \n\t\t\};/}" ${MODIFIED_DTS}
-	#edit dts file to set clock frequency to 65MHz instead of 100MHz
-	sed -i "0,/clock-frequency = <100/s//clock-frequency = <65/" ${MODIFIED_DTS}
+	#edit dts file to set clock frequency to 32MHz instead of 100MHz
+	sed -i "0,/clock-frequency = <100/s//clock-frequency = <32/" ${MODIFIED_DTS}
 fi
 
 
-if [ ! -d "${FREEDOM_SDK}/bsp/chipyard_arty" ]; then
-	mkdir ${FREEDOM_SDK}/bsp/chipyard_arty;
+if [ ! -d "${FREEDOM_SDK}/bsp/chipyard_${BOARD}_${CONFIG}" ]; then
+	mkdir ${FREEDOM_SDK}/bsp/chipyard_${BOARD}_${CONFIG};
 fi
 
 #Use Freedom E SDK 'update-targets.sh' script to generate board files
 cd ${FREEDOM_SDK}/bsp
-./update-targets.sh --target-name chipyard_arty --target-type arty --sdk-path=${FREEDOM_SDK} --target-dts=${MODIFIED_DTS} || exit 1;
+./update-targets.sh --target-name chipyard_${BOARD}_${CONFIG} --target-type ${BOARD} --sdk-path=${FREEDOM_SDK} --target-dts=${MODIFIED_DTS} || exit 1;
 
-echo "File Generation Complete. Find the created files in ${FREEDOM_SDK}/bsp/chipyard_arty"
+echo "File Generation Complete. Find the created files in ${FREEDOM_SDK}/bsp/chipyard_${BOARD}_${CONFIG}"
 
 cd ${EXIT_DIR}
